@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home Lab - Pop Culture Edition</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #1a1a2e;
+            --primary-purple: #9c27b0;
+            --bright-pink: #e91e63;
+            --electric-blue: #03a9f4;
+            --neon-green: #4caf50;
+            --card-bg: #2c2c54;
+            --text-light: #f0e6ff;
+            --text-dark: #161625;
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-light);
+        }
+        .font-bangers {
+            font-family: 'Bangers', cursive;
+            letter-spacing: 2px;
+        }
+        dialog {
+            background-color: var(--card-bg);
+            color: var(--text-light);
+        }
+        dialog::backdrop {
+            background: rgba(22, 22, 37, 0.6);
+            backdrop-filter: blur(5px);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: var(--bg-color);
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: var(--bright-pink);
+            border-radius: 20px;
+            border: 3px solid var(--bg-color);
+        }
+        .lab-card {
+            background-color: var(--card-bg);
+            border: 3px solid #474787;
+            transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+        }
+        .lab-card:hover {
+            transform: translateY(-8px) rotate(2deg);
+            box-shadow: 0 10px 20px rgba(233, 30, 99, 0.4);
+            border-color: var(--bright-pink);
+        }
+        .quiz-option input:checked + label {
+            border-color: var(--electric-blue);
+            background-color: rgba(3, 169, 244, 0.2);
+            color: #ffffff;
+            transform: scale(1.02);
+        }
+        /* --- Styles for Filter Buttons --- */
+        .filter-btn {
+            padding: 0.5rem 1.25rem;
+            font-size: 1rem;
+            font-weight: 600;
+            color: white;
+            background-color: rgba(99, 102, 241, 0.5);
+            border: 2px solid #818cf8;
+            border-radius: 9999px;
+            transition: all 0.2s ease-in-out;
+        }
+        .filter-btn:hover {
+            background-color: #6366f1;
+        }
+        .filter-btn.active-filter {
+            background-color: var(--bright-pink);
+            color: white;
+            border-color: var(--bright-pink);
+            box-shadow: 0 0 15px rgba(233, 30, 99, 0.5);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Section -->
+    <header class="bg-gradient-to-r from-purple-600 to-pink-500 py-4 border-b-4 border-black">
+        <div class="container mx-auto px-6 flex items-center justify-center space-x-4">
+            <span class="text-5xl">💥</span>
+            <h1 class="text-5xl md:text-6xl text-white font-bangers tracking-wider text-center" style="text-shadow: 3px 3px 0 #000;">
+                HOME LAB!
+            </h1>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-6 py-10">
+
+        <!-- Quiz Container -->
+        <div id="quiz-container">
+            <div class="max-w-3xl mx-auto bg-indigo-900/50 p-8 rounded-2xl border-4 border-electric-blue shadow-lg">
+                <h2 class="text-4xl font-bangers text-center text-white mb-2">Find Your Mission!</h2>
+                <p class="text-center text-slate-300 mb-8">Answer these 5 questions to get your top-secret experiment files!</p>
+                <form id="quiz-form">
+                    <!-- Quiz questions will be injected here -->
+                    <button type="submit" class="w-full bg-green-500 text-white font-bold py-4 px-4 rounded-xl hover:bg-green-600 transition-all text-2xl font-bangers tracking-widest border-b-4 border-green-700 active:border-b-0 active:translate-y-1">Get My Experiments!</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Results Container (Initially Hidden) -->
+        <div id="results-container" class="hidden">
+            <!-- Recommendations Section -->
+            <div id="recommendations-section" class="mb-12">
+                <h2 class="text-4xl font-bangers text-center text-white mb-6">Your Top 4 Missions!</h2>
+                <div id="recommendations-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <!-- Recommended experiment cards will be injected here -->
+                </div>
+            </div>
+
+            <!-- All Experiments Section -->
+            <div>
+                <h2 class="text-4xl font-bangers text-center text-white mb-6">The Experiment Archive</h2>
+                <div id="filter-buttons" class="flex flex-wrap justify-center gap-4 mb-10">
+                    <button class="filter-btn active-filter" data-category="all">All Files</button>
+                    <button class="filter-btn" data-category="chemistry">Chemistry 🧪</button>
+                    <button class="filter-btn" data-category="biology">Biology 🧬</button>
+                    <button class="filter-btn" data-category="physics">Physics ⚛️</button>
+                </div>
+                <div id="experiments-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- All other experiment cards will be injected here -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Experiment Details Modal -->
+    <dialog id="experiment-modal" class="p-0 rounded-2xl shadow-2xl w-11/12 max-w-3xl border-4 border-pink-500">
+        <div id="modal-content" class="custom-scrollbar overflow-y-auto max-h-[90vh]">
+            <!-- Modal content will be injected here -->
+        </div>
+    </dialog>
+
+
+    <script>
+        // --- DATA: EXPERIMENTS (with emoji property) ---
+        const experiments = [
+            // Biology
+            { id: 1, title: "Extract DNA from a Strawberry", emoji: "🍓", category: "biology", tags: ["biology", "long", "food", "gentle"], description: "Isolate and see the actual DNA of a fruit using common household items.", time: "30 mins", difficulty: "Medium", materials: ["1 strawberry", "Resealable plastic bag", "1/2 cup water", "2 tsp dish soap", "1 tsp salt", "Cheesecloth or coffee filter", "Rubbing alcohol (chilled in freezer)", "Clear glass or jar", "Tweezers or wooden stick"], instructions: ["Make the extraction liquid: In a cup, mix water, dish soap, and salt. Stir gently to avoid too many bubbles.", "Place one strawberry in the plastic bag, remove the air, and seal it.", "Mash the strawberry thoroughly for about 2 minutes until it's a uniform pulp.", "Add 3 tablespoons of the extraction liquid to the bag, reseal, and gently mix for 1 minute.", "Strain the mixture through the cheesecloth into a clear glass, collecting the liquid.", "Tilt the glass and slowly pour an equal amount of cold rubbing alcohol down the side. Do not mix.", "Watch for a white, stringy substance to form at the boundary between the alcohol and strawberry liquid. This is the DNA!", "Use tweezers to gently spool and remove the DNA from the glass."], explanation: "The soap breaks open the cell membranes (and the nuclear membranes), the salt helps the long DNA strands clump together by neutralizing their charge, and the alcohol, being less dense and unable to dissolve DNA, causes the DNA to precipitate out of the solution, making it visible to the naked eye." },
+            { id: 3, title: "Gummy Bear Osmosis", emoji: "🐻", category: "biology", tags: ["biology", "long", "food", "observation"], description: "Observe the process of osmosis by seeing how a gummy bear changes in different liquids.", time: "24 hours", difficulty: "Easy", materials: ["3 gummy bears", "3 small cups", "Water", "Salt", "Measuring spoons", "Ruler"], instructions: ["Measure the initial length and width of each gummy bear and record it.", "Label three cups: 'Plain Water', 'Salt Water', 'Control'.", "Place one gummy bear in the 'Control' cup (no liquid).", "Fill the 'Plain Water' cup with water and place a gummy bear inside.", "Create a hypertonic salt solution by dissolving 2 tablespoons of salt in a cup of water. Place the third gummy bear in this cup.", "Leave the cups for 8-24 hours.", "Carefully remove the gummy bears, measure them again, and compare the results to your initial measurements."], explanation: "This demonstrates osmosis, the movement of water across a semi-permeable membrane (the gelatin in the gummy bear) from an area of high water concentration to low water concentration. In plain water (hypotonic), water moves into the bear to balance the high sugar concentration inside, causing it to swell. In salt water (hypertonic), the concentration of solutes is higher outside the bear, so water moves out, causing it to shrink." },
+            { id: 6, title: "Dissect a Flower", emoji: "🌸", category: "biology", tags: ["biology", "quick", "gentle", "observation"], description: "Learn the anatomy of a flower by carefully taking it apart.", time: "25 mins", difficulty: "Easy", materials: ["A large flower (lily, tulip, or hibiscus work well)", "Tweezers", "Magnifying glass", "White paper", "Tape"], instructions: ["Place the flower on the white paper.", "Gently remove the outer layer of petals (the corolla). Tape them to the paper and label them.", "Identify and remove the sepals, the small green leaf-like parts at the base of the flower.", "Use tweezers to carefully remove the stamens (the male parts), which consist of the anther (pollen-covered tip) and filament (stalk).", "Finally, identify the pistil (the female part) in the center, which consists of the stigma (sticky top), style (tube), and ovary (base).", "If possible, carefully cut open the ovary to see the tiny ovules inside."], explanation: "This physical exploration reveals the reproductive structures of a flowering plant (angiosperm). Each part has a specific function: petals attract pollinators, stamens produce pollen (male gametes), and the pistil receives pollen and contains the ovary, where ovules (female gametes) develop into seeds after fertilization." },
+            { id: 8, title: "Build a Lung Model", emoji: "🫁", category: "biology", tags: ["biology", "build", "gentle", "quick"], description: "Create a working model that demonstrates the action of the diaphragm in breathing.", time: "30 mins", difficulty: "Medium", materials: ["Clear plastic bottle (2-liter)", "2 small balloons", "1 large balloon", "2 straws", "Modeling clay or putty", "Scissors", "Tape"], instructions: ["Cut the bottom off the plastic bottle (adult help needed).", "Create a 'trachea' by joining two straws with tape to form a Y-shape.", "Place a small balloon on the end of each arm of the 'Y' and secure with tape. These are the lungs.", "Feed the straw structure into the bottle so the 'lungs' are inside and the single straw end sticks out of the neck.", "Use clay to seal the opening at the neck of the bottle around the straw.", "Cut the knot end off the large balloon and stretch the open end over the cut bottom of the bottle. This is the diaphragm.", "Gently pull down on the 'diaphragm' balloon and watch the 'lung' balloons inflate. Push it up and watch them deflate."], explanation: "This model demonstrates how the diaphragm muscle controls breathing. Pulling the bottom balloon down increases the volume inside the bottle, which decreases the air pressure. Air from the outside rushes in through the straw to equalize the pressure, inflating the 'lungs'. Pushing it up decreases the volume, increases the pressure, and forces air out." },
+            { id: 10, title: "Sprout Seeds in a Jar", emoji: "🌱", category: "biology", tags: ["biology", "long", "food", "observation"], description: "Watch the process of germination up close as seeds come to life.", time: "5-7 days", difficulty: "Easy", materials: ["1/4 cup of seeds (lentils, mung beans, or alfalfa work well)", "Large glass jar", "Cheesecloth or a piece of mesh", "Rubber band"], instructions: ["Place the seeds in the jar and cover them with water. Let them soak overnight.", "The next morning, drain the water through the cheesecloth (use the rubber band to hold it in place).", "Rinse the seeds with fresh water and drain again thoroughly.", "Place the jar on its side in a place with indirect sunlight.", "Rinse and drain the seeds twice a day (morning and evening).", "Within a few days, you will see tiny sprouts emerging from the seeds. Continue the process until they are ready to eat or observe further."], explanation: "Germination is the process where a seed, given the right conditions (water, oxygen, and warmth), begins to grow into a plant. The water activates enzymes within the seed that break down stored food reserves. This energy fuels the growth of the radicle (embryonic root) and the plumule (embryonic shoot), which you can see emerging from the seed coat." },
+            { id: 12, title: "Observe Yeast Metabolism", emoji: "🎈", category: "biology", tags: ["biology", "food", "observation", "long"], description: "See yeast 'breathe' by capturing the carbon dioxide it produces.", time: "1-2 hours", difficulty: "Easy", materials: ["1 packet of active dry yeast", "1 tsp sugar", "1 cup warm water", "A plastic bottle", "A balloon"], instructions: ["Pour the warm water into the plastic bottle.", "Add the yeast and sugar to the water.", "Gently swirl the bottle to mix the contents.", "Stretch the opening of the balloon over the neck of the bottle.", "Place the bottle in a warm spot.", "Observe the bottle over the next hour. The balloon will slowly inflate."], explanation: "Yeast is a single-celled fungus. When provided with sugar (food) and warmth, it undergoes anaerobic respiration. It breaks down the sugar to get energy, and in the process, releases carbon dioxide gas and ethanol. The CO₂ gas fills the bottle and then inflates the balloon, providing visible proof of this metabolic process." },
+            { id: 14, title: "Make a Simple Terrarium", emoji: "🏞️", category: "biology", tags: ["biology", "build", "long", "gentle"], description: "Build a self-sustaining ecosystem in a jar.", time: "45 mins", difficulty: "Medium", materials: ["A large, clear glass jar with a lid", "Small pebbles or gravel", "Activated charcoal", "Potting soil", "Small, humidity-loving plants (moss, ferns, fittonia)"], instructions: ["Create a drainage layer by adding 1-2 inches of pebbles at the bottom of the jar.", "Add a thin layer (1/2 inch) of activated charcoal on top of the pebbles.", "Add a layer of 2-3 inches of potting soil.", "Carefully plant your small plants in the soil, arranging them as you like.", "Lightly water the soil, just enough to make it damp, not soggy.", "Seal the jar with the lid and place it in a spot with bright, indirect light."], explanation: "A sealed terrarium is a miniature, self-contained ecosystem that demonstrates the water cycle. The plants release water vapor through transpiration. This vapor condenses on the cooler glass walls of the jar and then 'rains' back down to water the plants. The charcoal helps to filter the water and prevent microbial growth, keeping the ecosystem healthy." },
+            { id: 26, title: "Leaf Stomata Peel", emoji: "🍃", category: "biology", tags: ["biology", "quick", "observation", "gentle"], description: "Make an impression of a leaf's surface to see its breathing pores.", time: "20 mins", difficulty: "Medium", materials: ["A fresh leaf (lettuce or spinach works well)", "Clear nail polish", "Clear tape", "A microscope or strong magnifying glass"], instructions: ["Paint a small, thick patch of clear nail polish on the underside of the leaf.", "Let the nail polish dry completely for about 10-15 minutes.", "Place a piece of clear tape over the dried nail polish patch and press down firmly.", "Gently peel the tape off the leaf. The nail polish impression should come with it.", "Stick the tape onto a glass slide or a piece of white paper.", "Look at the impression under a microscope or magnifying glass. You should see the outlines of the cells and the small, mouth-like stomata."], explanation: "Stomata are tiny pores on the surface of leaves that plants use for gas exchange. They take in carbon dioxide for photosynthesis and release oxygen and water vapor. This nail polish method creates a perfect cast, or impression, of the leaf's surface, allowing us to see these microscopic structures." },
+            { id: 27, title: "Build a Wormery", emoji: "🪱", category: "biology", tags: ["biology", "long", "build", "observation", "messy"], description: "Create a see-through home for worms and watch them work.", time: "1 hour + observation", difficulty: "Medium", materials: ["A large, clear plastic bottle (2-liter)", "Soil", "Sand", "Earthworms", "Dead leaves, vegetable scraps", "Black paper", "Tape"], instructions: ["Cut the top off the 2-liter bottle (adult help needed).", "Add alternating layers of damp soil and sand to the bottle. This makes the tunnels easier to see.", "Gently place a few earthworms on the top layer.", "Add some food for the worms on top, like dead leaves or tiny vegetable scraps.", "Poke a few small air holes in the bottle cap and place it back on.", "Wrap the bottle with black paper and tape it in place. Worms prefer the dark.", "Remove the paper for a few minutes each day to observe the tunnels the worms create."], explanation: "This wormery demonstrates how earthworms act as 'ecosystem engineers'. They burrow through the soil, which aerates it and mixes the layers (a process called bioturbation). They also break down organic matter (the leaves and scraps), enriching the soil with nutrients, which is vital for plant growth." },
+            { id: 28, title: "Test Your Reflexes", emoji: "📏", category: "biology", tags: ["biology", "quick", "gentle", "observation"], description: "Measure your reaction time with this simple ruler drop test.", time: "10 mins", difficulty: "Easy", materials: ["A ruler", "A partner", "A pen and paper"], instructions: ["Have your partner sit with their arm resting on a table, their hand hanging off the edge.", "Your partner should have their thumb and index finger open and ready.", "Hold the ruler so the '0' mark is level with their fingers.", "Without warning, drop the ruler.", "Your partner must catch it as quickly as they can.", "Record the measurement (in cm) where their fingers caught the ruler. The lower the number, the faster their reaction time.", "Repeat several times and calculate the average. Then, switch roles!"], explanation: "This tests the speed of your nervous system. Your eyes see the ruler fall and send a signal to your brain. Your brain processes this information and sends a signal to the muscles in your hand to catch it. The time it takes for this entire process to happen is your reaction time. Practice can sometimes improve it!" },
+
+            // Chemistry
+            { id: 2, title: "Red Cabbage pH Indicator", emoji: "🥬", category: "chemistry", tags: ["chemistry", "color", "messy", "food"], description: "Create a natural pH indicator to test if substances are acidic or basic.", time: "45 mins", difficulty: "Medium", materials: ["Red cabbage leaves", "Hot water", "Blender or knife", "Large bowl or jar", "Strainer", "Several clear cups", "Test substances: lemon juice, vinegar, baking soda solution, soapy water"], instructions: ["Chop or blend the red cabbage leaves and place them in a large bowl.", "Pour hot water over the cabbage until it's fully submerged. Let it steep for 30 minutes, or until the water is deeply colored.", "Strain the liquid into a jar. This purple liquid is your pH indicator.", "Pour a small amount of the indicator into several clear cups.", "Add a few drops of a different test substance to each cup and observe the color change.", "Acids (like lemon juice) will turn the indicator pink/red. Bases (like baking soda) will turn it blue/green/yellow."], explanation: "Red cabbage contains a pigment molecule called anthocyanin. This molecule changes its chemical structure and shape depending on the concentration of hydrogen ions (the pH) in the solution. This change in structure alters how it absorbs and reflects light, causing its color to change, making it an excellent natural indicator for acids and bases." },
+            { id: 4, title: "Make Bioplastic from Milk", emoji: "🥛", category: "chemistry", tags: ["chemistry", "build", "long", "food"], description: "Create a simple, moldable plastic using milk and vinegar.", time: "20 mins + drying", difficulty: "Medium", materials: ["1 cup of milk", "4 tsp of white vinegar", "A saucepan", "A stove (adult supervision required)", "A strainer or coffee filter", "Paper towels"], instructions: ["With an adult, gently heat the milk in a saucepan until it is warm, but not boiling.", "Remove the pan from the heat and stir in the vinegar. You will see curds (solid lumps) begin to form almost immediately.", "Continue stirring for about a minute to ensure all the protein reacts.", "Pour the mixture through a strainer to separate the solid curds from the liquid whey.", "Let the curds cool, then press them between paper towels to absorb as much excess liquid as possible.", "Knead the resulting lump of material. You can now mold it into shapes, use cookie cutters, or add food coloring. Let it dry for 48 hours to harden completely."], explanation: "Milk contains a protein called casein. When you add an acid (vinegar), it causes the casein molecules to denature (unfold) and rearrange into long chains, a process called polymerization. These chains form a solid material, a simple bioplastic, which separates (precipitates) from the liquid whey." },
+            { id: 5, title: "Crystallize Your Own Rock Candy", emoji: "💎", category: "chemistry", tags: ["chemistry", "build", "long", "food"], description: "Grow large sugar crystals on a string by creating a supersaturated solution.", time: "1 week", difficulty: "Easy", materials: ["2 cups sugar", "1 cup water", "Saucepan", "Glass jar", "String", "Pencil or skewer", "Food coloring (optional)"], instructions: ["Tie a string to the middle of a pencil and ensure it hangs down into the jar without touching the bottom or sides.", "In a saucepan, bring the water to a boil. Gradually stir in the sugar until it is completely dissolved. You are creating a supersaturated solution.", "Let the solution cool for 15-20 minutes. If desired, add a few drops of food coloring.", "Pour the warm solution into the jar.", "Rest the pencil across the top of the jar so the string is submerged.", "Place the jar in a quiet place where it won't be disturbed. Crystals will start to form within a day and grow over the week."], explanation: "By dissolving a large amount of sugar in hot water, you create a supersaturated solution, meaning it contains more dissolved solute than it normally could at a lower temperature. As the solution cools, the water can no longer hold all the sugar, so the sugar molecules begin to come out of the solution and form solid crystals on a nucleation site (the string)." },
+            { id: 7, title: "Testing for Starch", emoji: "🥔", category: "chemistry", tags: ["chemistry", "quick", "food", "color"], description: "Use iodine to detect the presence of starch in various common foods.", time: "15 mins", difficulty: "Easy", materials: ["Iodine solution (tincture of iodine from a pharmacy)", "Dropper", "Various foods (a slice of potato, bread, apple, cheese, a sugar cube)", "White plate"], instructions: ["Place small samples of each food on the white plate.", "Add a drop of water to each food sample.", "Using the dropper, add one drop of iodine solution to each food sample.", "Observe any color changes. A change to a dark blue-black color indicates the presence of starch.", "Note which foods contain starch and which do not."], explanation: "Starch is a complex carbohydrate (a polymer of glucose). The iodine solution contains triiodide ions (I₃⁻) which slip into the helical (coiled) structure of the starch molecule. This interaction forms a starch-iodine complex that absorbs light differently than iodine alone, resulting in the characteristic deep blue-black color. This is a classic chemical test for starch." },
+            { id: 9, title: "Electrolysis of Water", emoji: "⚡️", category: "chemistry", tags: ["chemistry", "observation", "quick", "challenge"], description: "Split water molecules into hydrogen and oxygen gas using electricity.", time: "30 mins", difficulty: "Hard", materials: ["9V battery", "2 pencils (sharpened at both ends)", "Glass of warm salt water", "Cardboard square to fit over the glass", "Electrical tape or two alligator clip leads"], instructions: ["Pour the warm salt water into the glass.", "Poke two holes in the cardboard, just far enough apart for the pencils to fit through snugly.", "Push the pencils through the holes so their bottom tips are submerged in the water and their top tips stick out.", "Place the cardboard on top of the glass.", "Connect the two terminals of the 9V battery to the top graphite tips of the pencils using alligator clips or by taping wires.", "Observe the pencil tips in the water. You will see bubbles forming on both tips. One will bubble about twice as fast as the other."], explanation: "This process is called electrolysis. The electricity from the battery flows through the salt water (the salt makes it conductive) and breaks apart the water molecules (H₂O). The water splits into hydrogen gas (H₂) and oxygen gas (O₂). Bubbles of hydrogen form at the negative electrode (cathode) and oxygen at the positive electrode (anode). Since there are two hydrogen atoms for every one oxygen atom in water, you produce twice as much hydrogen gas, which is why one pencil bubbles faster." },
+            { id: 11, title: "Homemade Slime (Polymerization)", emoji: "🦠", category: "chemistry", tags: ["chemistry", "messy", "build", "quick"], description: "Create a non-Newtonian fluid by cross-linking polymer chains.", time: "15 mins", difficulty: "Easy", materials: ["White PVA glue", "Borax solution (1 tsp Borax in 1 cup warm water)", "Water", "Food coloring", "Mixing bowl"], instructions: ["In a bowl, mix 1/2 cup of glue with 1/2 cup of water.", "Add a few drops of food coloring and mix well.", "Slowly stir in the Borax solution, a tablespoon at a time.", "Keep stirring. You'll feel the mixture start to thicken and pull away from the sides of the bowl.", "Once it's too thick to stir, take it out and knead it with your hands until it reaches the desired consistency."], explanation: "Glue contains long, flexible polymer molecules (polyvinyl acetate). The Borax solution creates cross-links between these chains, tying them together like a net. This process, called polymerization, changes the liquid glue into a semi-solid, rubbery substance known as a non-Newtonian fluid, whose viscosity changes under stress." },
+            { id: 13, title: "Create a Spherification 'Ravioli'", emoji: "🍮", category: "chemistry", tags: ["chemistry", "food", "challenge", "quick"], description: "Use molecular gastronomy to trap a liquid in a gel-like sphere.", time: "30 mins", difficulty: "Hard", materials: ["Calcium chloride", "Sodium alginate", "A flavorful liquid (e.g., fruit juice)", "Water", "Two bowls", "A syringe or dropper"], instructions: ["In one bowl, dissolve 1/2 tsp of sodium alginate in 1 cup of fruit juice (an immersion blender works best to avoid clumps). Let it rest.", "In a second, larger bowl, dissolve 1 tsp of calcium chloride in 2 cups of water. This is the 'calcium bath'.", "Using a syringe, drop small droplets of the alginate/juice mixture into the calcium bath.", "The droplets will instantly form small gel spheres. Let them sit in the bath for a minute.", "Gently remove the spheres with a slotted spoon and rinse them in a bowl of plain water."], explanation: "This is a key technique in molecular gastronomy called spherification. Sodium alginate is a long polymer derived from seaweed. When it comes into contact with calcium ions, the calcium acts as a cross-linker, instantly forming a gel matrix. This creates a thin, flexible skin around the liquid droplet, trapping the juice inside." },
+            { id: 15, title: "Penny Cleaning Chemistry", emoji: "🪙", category: "chemistry", tags: ["chemistry", "quick", "color", "food"], description: "Use a simple acid-base reaction to make dull pennies shiny again.", time: "10 mins", difficulty: "Easy", materials: ["Dull pennies", "1/4 cup white vinegar", "1 tsp salt", "A non-metal bowl", "Paper towels"], instructions: ["Pour the vinegar into the bowl and stir in the salt until it dissolves.", "Place the dull pennies into the solution, making sure they are submerged.", "Wait for about 5 minutes, or until you see them becoming shiny. You can gently stir them.", "Remove the pennies and rinse them thoroughly with water.", "Dry the pennies with a paper towel. For an extra step, leave some pennies un-rinsed and see what happens after an hour (they turn green!)."], explanation: "Pennies are coated in copper. Over time, this copper reacts with oxygen in the air to form copper oxide, which makes them look dull. The vinegar (acetic acid) and salt (sodium chloride) mixture reacts with the copper oxide, dissolving it and revealing the shiny copper underneath. If not rinsed, the leftover acid and salt will react with the copper and oxygen to form a blue-green compound called malachite." },
+            { id: 29, title: "Secret Agent Invisible Ink", emoji: "🍋", category: "chemistry", tags: ["chemistry", "quick", "food", "gentle"], description: "Write a secret message that can only be revealed with heat.", time: "15 mins", difficulty: "Easy", materials: ["Half a lemon", "Water", "A bowl", "A cotton swab", "White paper", "A lamp or other heat source (adult supervision required)"], instructions: ["Squeeze the lemon juice into the bowl and add a few drops of water. Mix it.", "Dip the cotton swab in the lemon juice mixture and write your secret message on the paper.", "Let the paper dry completely. The message will be invisible.", "To reveal the message, have an adult help you hold the paper close to a warm light bulb.", "The heat will cause the writing to turn brown and appear!"], explanation: "Lemon juice is an organic substance that oxidizes (reacts with oxygen) when heated. The lemon juice solution weakens the paper's fibers. When you heat the paper, the part with the lemon juice burns, or oxidizes, faster than the rest of the paper, revealing the brown-colored message before the paper itself burns." },
+            { id: 30, title: "Make Mysterious Oobleck", emoji: "👽", category: "chemistry", tags: ["chemistry", "quick", "messy", "food", "build"], description: "Create a bizarre fluid that's both a liquid and a solid.", time: "10 mins", difficulty: "Easy", materials: ["1 cup of cornstarch", "1/2 cup of water", "A large bowl", "Food coloring (optional)"], instructions: ["Pour the cornstarch into the large bowl.", "If using food coloring, add it to the water now.", "Slowly pour the water into the cornstarch, mixing with your hands as you go.", "Keep mixing until it's all combined. The consistency should be thick but still runny.", "Try punching it quickly - it will feel solid. Try letting your fingers sink in slowly - it will feel like a liquid.", "Try rolling it into a ball and then stopping - it will melt in your hand!"], explanation: "Oobleck is a non-Newtonian fluid. Specifically, it's a shear-thickening fluid. The cornstarch particles don't dissolve in the water; they are suspended. When you apply sudden force (shear stress), the particles jam together, trapping the water and making the mixture act like a solid. When you move slowly, the particles have time to slide past each other, allowing it to flow like a liquid." },
+
+            // Physics
+            { id: 16, title: "Build a Simple Catapult", emoji: "🏹", category: "physics", tags: ["physics", "build", "quick", "messy"], description: "Explore potential and kinetic energy by launching small objects.", time: "20 mins", difficulty: "Easy", materials: ["10 popsicle sticks", "Rubber bands", "A plastic bottle cap", "Hot glue (optional)", "Mini marshmallows for ammo"], instructions: ["Stack 8 popsicle sticks together and wrap rubber bands tightly around both ends.", "Stack the remaining 2 sticks and wrap a rubber band around only one end.", "Wedge the stack of 8 sticks between the 2 sticks.", "Wrap a rubber band in a cross-shape around the intersection to hold it securely.", "Glue the bottle cap to the top stick to act as a launching basket.", "Press down on the lever arm and release to launch your marshmallow!"], explanation: "When you press down on the catapult's arm, you are storing potential energy in the tension of the rubber bands and the wood. When you release it, this stored potential energy is instantly converted into kinetic energy (the energy of motion), which flings the marshmallow forward." },
+            { id: 17, title: "Static Electricity Butterfly", emoji: "🦋", category: "physics", tags: ["physics", "gentle", "quick", "observation"], description: "Make a paper butterfly's wings flap using static electricity.", time: "10 mins", difficulty: "Easy", materials: ["Tissue paper", "Scissors", "A balloon", "Your hair"], instructions: ["Cut a small butterfly shape from the tissue paper.", "Fold it in half so its wings stand up.", "Blow up the balloon and rub it vigorously on your hair for 10 seconds to build a static charge.", "Slowly bring the balloon near the butterfly without touching it.", "Watch as the wings are attracted to the balloon and start to flap!"], explanation: "Rubbing the balloon on your hair transfers electrons, giving the balloon a negative static charge. The paper butterfly is neutral. This charge creates an electric field that polarizes the paper, attracting it. This non-contact force is strong enough to lift the lightweight tissue paper wings." },
+            { id: 18, title: "DIY Lava Lamp", emoji: "🌋", category: "physics", tags: ["physics", "color", "observation", "messy"], description: "Create a groovy, bubbling lamp by exploring liquid density and chemical reactions.", time: "15 mins", difficulty: "Easy", materials: ["A clear plastic bottle or glass jar", "Water", "Vegetable oil", "Food coloring", "An effervescent tablet (like Alka-Seltzer)"], instructions: ["Fill the bottle about 2/3 full with vegetable oil.", "Fill the rest of the bottle with water, leaving a little space at the top.", "Add about 10 drops of food coloring. Notice how it only colors the water.", "Break an effervescent tablet in half and drop it into the bottle.", "Watch the bubbly reaction!"], explanation: "This experiment showcases density and polarity. Oil is less dense than water, so it floats on top. Water and oil don't mix because water is polar and oil is nonpolar. The tablet reacts with the water to create carbon dioxide gas bubbles. These bubbles stick to the colored water blobs, carrying them to the top. When the gas escapes, the dense water blobs sink back down, creating the lava lamp effect." },
+            { id: 19, title: "Cartesian Diver", emoji: "🦑", category: "physics", tags: ["physics", "build", "quick", "observation"], description: "Build a classic toy that demonstrates buoyancy and pressure.", time: "15 mins", difficulty: "Medium", materials: ["A plastic bottle with a cap", "An eyedropper or a pen cap", "Modeling clay"], instructions: ["Fill the bottle completely to the top with water.", "If using an eyedropper, suck up just enough water so it barely floats. If using a pen cap, add a small piece of clay to the bottom until it just barely floats.", "Place your 'diver' into the bottle and screw the cap on tightly.", "Squeeze the sides of the bottle firmly. The diver should sink.", "Release the pressure, and the diver should float back to the top."], explanation: "This is all about Pascal's Law and buoyancy. Squeezing the bottle increases the pressure inside, forcing more water up into the diver. This makes the diver heavier (more dense), causing it to sink. Releasing the pressure allows the compressed air bubble inside the diver to expand, pushing water out and making it less dense, so it floats." },
+            { id: 20, title: "Build an Electromagnet", emoji: "🧲", category: "physics", tags: ["physics", "build", "challenge", "quick"], description: "Turn a simple nail into a magnet using electricity.", time: "15 mins", difficulty: "Medium", materials: ["A large iron nail", "Insulated copper wire (about 3 feet)", "A D-cell battery", "Paperclips"], instructions: ["Leave about 6 inches of wire at one end, and tightly wrap the rest of the wire around the nail. Do not overlap the coils.", "Leave another 6 inches of wire at the other end.", "Carefully strip about an inch of the insulation off both ends of the wire (adult help needed).", "Connect one end of the wire to the positive terminal of the battery and the other to the negative terminal. The nail is now an electromagnet!", "Try to pick up paperclips with it. Disconnect the battery and see what happens."], explanation: "When an electric current flows through a wire, it creates a magnetic field. By coiling the wire around an iron core (the nail), you concentrate this magnetic field, turning the nail into a temporary magnet, or electromagnet. The magnetic field disappears as soon as the electric current is turned off." },
+            { id: 21, title: "Center of Gravity Fork Trick", emoji: "🍴", category: "physics", tags: ["physics", "gentle", "quick", "challenge"], description: "Perform a mind-boggling balancing act that seems to defy gravity.", time: "10 mins", difficulty: "Medium", materials: ["Two forks", "A toothpick", "A glass or cup"], instructions: ["Interlock the tines of the two forks so they are firmly stuck together.", "Slide the toothpick through the middle of the interlocked tines.", "Carefully balance the tip of the toothpick on the rim of the glass.", "Adjust the forks until the system balances perfectly. It will look like it's floating!"], explanation: "This works because you have created a system where the center of gravity is located directly below the pivot point (the tip of the toothpick on the glass). Even though the forks extend far out, their combined weight is centered underneath the rim of the glass, making the structure surprisingly stable." },
+            { id: 22, title: "Sound Vibrations with a Hanger", emoji: "🔔", category: "physics", tags: ["physics", "observation", "quick", "gentle"], description: "Turn a simple clothes hanger into a surprisingly loud gong.", time: "5 mins", difficulty: "Easy", materials: ["A metal clothes hanger", "Two pieces of string, about 2 feet each"], instructions: ["Tie one end of each string to the corners of the hanger.", "Wrap the other end of each string once around your index fingers.", "Gently place your index fingers in your ears.", "Lean forward so the hanger dangles freely and swing it so it gently bumps against a table or wall.", "Listen to the deep, resonant gong sound!"], explanation: "When the metal hanger vibrates, it creates sound waves. Usually, these waves spread out into the air and aren't very loud. By using the strings, you are conducting these vibrations directly to your ears through a solid medium (the string and your fingers), which is much more efficient than air. This makes the sound seem much louder and deeper." },
+            { id: 23, title: "Domino Chain Reaction", emoji: "💥", category: "physics", tags: ["physics", "build", "observation", "long"], description: "Explore energy transfer and chain reactions with a classic setup.", time: "30+ mins", difficulty: "Easy", materials: ["A set of dominoes (or books of the same size)"], instructions: ["Set up a line of dominoes, standing them on their ends.", "Experiment with the spacing. If they are too far apart, the chain will stop. If they are too close, they won't fall with much force.", "Create curves, splits, and patterns.", "Once your masterpiece is ready, tip the first domino and watch the chain reaction unfold."], explanation: "Each standing domino has stored potential energy due to its position. When you push the first one, you convert your energy into kinetic energy, which is then transferred to the next domino in the line. This transfer of energy continues from one domino to the next, creating a wave of falling dominoes known as a chain reaction." },
+            { id: 24, title: "DIY Hovercraft", emoji: "🛸", category: "physics", tags: ["physics", "build", "quick", "gentle"], description: "Build a simple hovercraft that floats on a cushion of air.", time: "15 mins", difficulty: "Medium", materials: ["An old CD or DVD", "A pop-top bottle cap", "A balloon", "Hot glue"], instructions: ["Glue the pop-top cap securely over the hole in the center of the CD, making sure it's airtight. Ensure the cap is in the closed position.", "Blow up the balloon as much as you can and pinch the neck to keep the air in.", "Carefully stretch the neck of the balloon over the pop-top cap.", "Place your hovercraft on a smooth, flat surface, like a table.", "Lift the pop-top to open it. The air will rush out, and your hovercraft will glide across the surface!"], explanation: "The escaping air from the balloon creates a thin cushion of air between the CD and the table. This cushion lifts the CD slightly, dramatically reducing the friction between it and the surface. With very little friction to slow it down, the hovercraft can glide around freely." },
+            { id: 25, title: "Pinhole Camera (Camera Obscura)", emoji: "📷", category: "physics", tags: ["physics", "build", "observation", "challenge"], description: "Explore how lenses work by creating a simple camera that projects an image.", time: "30 mins", difficulty: "Hard", materials: ["A cardboard box (like a shoebox)", "Black paint or paper", "A small piece of aluminum foil", "A pin", "Wax paper or tracing paper", "Tape"], instructions: ["Make the inside of the box completely dark by painting it black or lining it with black paper.", "Cut a small square window (1x1 inch) at one end of the box.", "Tape the piece of aluminum foil over this window.", "Use a pin to poke a single, tiny, clean hole in the center of the foil.", "At the other end of the box, cut a larger viewing window and tape a piece of wax paper over it. This is your screen.", "Point the pinhole end towards a bright object (like a window) and look at the wax paper screen. You will see a faint, upside-down image."], explanation: "This demonstrates the basic principle of how a camera works. Light travels in straight lines. The pinhole only allows a very small amount of light from the scene to pass through. Light from the top of the object passes through the pinhole and lands on the bottom of the screen, and light from the bottom of the object lands on the top of the screen. This is why the projected image is inverted (upside-down)." },
+        ];
+        
+        // --- DATA: QUIZ ---
+        const quizQuestions = [
+            { question: "How much time do you have?", name: "time", options: [ { text: "Quick & snappy!", tag: "quick" }, { text: "An epic adventure!", tag: "long" } ] },
+            { question: "What's your style?", name: "field", options: [ { text: "Life & Living Things! 🧬", tag: "biology" }, { text: "Potions & Reactions! 🧪", tag: "chemistry" }, { text: "Forces & Motion! ⚛️", tag: "physics" } ] },
+            { question: "What's the goal?", name: "result", options: [ { text: "Awesome colors!", tag: "color" }, { text: "Build something cool!", tag: "build" }, { text: "Watch & discover!", tag: "observation" } ] },
+            { question: "Mess level?", name: "mess", options: [ { text: "Super clean", tag: "gentle" }, { text: "Let's get messy!", tag: "messy" } ] },
+            { question: "Power source?", name: "ingredient", options: [ { text: "Kitchen stuff!", tag: "food" }, { text: "Next-level challenge!", tag: "challenge" } ] }
+        ];
+
+        // --- DOM ELEMENTS ---
+        const quizContainer = document.getElementById('quiz-container');
+        const quizForm = document.getElementById('quiz-form');
+        const resultsContainer = document.getElementById('results-container');
+        const recommendationsGrid = document.getElementById('recommendations-grid');
+        const experimentsGrid = document.getElementById('experiments-grid');
+        const modal = document.getElementById('experiment-modal');
+        const modalContent = document.getElementById('modal-content');
+        const filterButtonsContainer = document.getElementById('filter-buttons');
+
+        // --- FUNCTIONS ---
+
+        function renderQuiz() {
+            let quizHTML = '';
+            quizQuestions.forEach((q, index) => {
+                quizHTML += `<div class="mb-6">
+                    <p class="font-semibold text-xl text-center text-white mb-4">${q.question}</p>
+                    <div class="grid sm:grid-cols-${q.options.length} gap-4">`;
+                q.options.forEach((opt, optIndex) => {
+                    const id = `${q.name}-${optIndex}`;
+                    quizHTML += `<div class="quiz-option">
+                        <input type="radio" id="${id}" name="${q.name}" value="${opt.tag}" class="hidden" required>
+                        <label for="${id}" class="block w-full text-center p-4 border-4 border-slate-600 rounded-xl cursor-pointer transition-all duration-200 font-semibold">${opt.text}</label>
+                    </div>`;
+                });
+                quizHTML += `</div></div>`;
+            });
+            quizForm.insertAdjacentHTML('afterbegin', quizHTML);
+        }
+
+        function handleQuizSubmit(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const userTags = [];
+            for (let value of formData.values()) {
+                userTags.push(value);
+            }
+            
+            const scoredExperiments = experiments.map(exp => {
+                let score = exp.tags.reduce((acc, tag) => userTags.includes(tag) ? acc + 1 : acc, 0);
+                // Boost score if the category matches
+                if (exp.tags.includes(userTags[1])) {
+                    score += 2;
+                }
+                return { ...exp, score };
+            });
+
+            scoredExperiments.sort((a, b) => b.score - a.score);
+
+            const recommendations = scoredExperiments.slice(0, 4);
+            const otherExperiments = experiments.filter(exp => !recommendations.some(rec => rec.id === exp.id));
+            
+            renderResults(recommendations, otherExperiments);
+        }
+
+        function renderResults(recommendations, others) {
+            quizContainer.classList.add('hidden');
+            resultsContainer.classList.remove('hidden');
+
+            recommendationsGrid.innerHTML = '';
+            recommendations.forEach(exp => {
+                const card = createExperimentCard(exp);
+                recommendationsGrid.appendChild(card);
+            });
+            
+            renderExperimentGrid(others, 'all');
+        }
+        
+        function renderExperimentGrid(expList, category) {
+            experimentsGrid.innerHTML = '';
+            const filteredList = category === 'all' ? expList : expList.filter(exp => exp.category === category);
+
+            filteredList.forEach(exp => {
+                const card = createExperimentCard(exp);
+                experimentsGrid.appendChild(card);
+            });
+        }
+
+        function createExperimentCard(exp) {
+            const card = document.createElement('div');
+            card.className = 'lab-card p-5 rounded-xl shadow-lg flex flex-col cursor-pointer';
+            card.dataset.id = exp.id;
+            card.innerHTML = `
+                <div class="text-6xl text-center mb-4">${exp.emoji}</div>
+                <h3 class="text-xl font-bold text-white text-center mb-2 flex-grow">${exp.title}</h3>
+                <div class="mt-4 text-center">
+                    <span class="inline-block bg-${getCategoryColor(exp.category)}-500 text-white text-xs font-semibold mr-2 px-3 py-1 rounded-full uppercase tracking-wider">${exp.category}</span>
+                </div>
+            `;
+            card.addEventListener('click', () => openModal(exp));
+            return card;
+        }
+
+        function openModal(exp) {
+            const fullExp = experiments.find(e => e.id === exp.id);
+            modalContent.innerHTML = `
+                <div class="p-1">
+                    <div class="bg-gradient-to-r from-${getCategoryColor(fullExp.category)}-500 to-${getCategoryColor(fullExp.category)}-400 p-6 rounded-t-xl">
+                        <div class="flex justify-between items-start">
+                            <h2 class="text-4xl font-bangers text-white" style="text-shadow: 2px 2px 0 #000;">${fullExp.title} ${fullExp.emoji}</h2>
+                            <button id="close-modal-btn" class="text-4xl text-white hover:text-pink-300 transition-colors font-bold">&times;</button>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <p class="text-slate-300 mb-6 font-semibold">${fullExp.description}</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div>
+                                <h3 class="text-2xl font-bangers mb-3 text-pink-400">Gear Up!</h3>
+                                <ul class="list-disc list-inside space-y-1.5 text-slate-200 bg-slate-800/50 p-4 rounded-lg">
+                                    ${fullExp.materials.map(item => `<li>${item}</li>`).join('')}
+                                </ul>
+                            </div>
+                            <div>
+                                <h3 class="text-2xl font-bangers mb-3 text-blue-400">The Mission!</h3>
+                                <ol class="list-decimal list-inside space-y-3 text-slate-200">
+                                    ${fullExp.instructions.map((step) => `<li>${step}</li>`).join('')}
+                                </ol>
+                            </div>
+                        </div>
+                        <div class="mt-8">
+                            <h3 class="text-2xl font-bangers mb-3 text-green-400">The Science!</h3>
+                            <p class="text-slate-300 leading-relaxed">${fullExp.explanation}</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            modal.showModal();
+            document.getElementById('close-modal-btn').addEventListener('click', () => modal.close());
+        }
+        
+        function getCategoryColor(category) {
+            if (category === 'chemistry') return 'pink';
+            if (category === 'biology') return 'blue';
+            if (category === 'physics') return 'green';
+            return 'gray';
+        }
+
+        // --- EVENT LISTENERS ---
+        quizForm.addEventListener('submit', handleQuizSubmit);
+
+        filterButtonsContainer.addEventListener('click', (e) => {
+            if (e.target.classList.contains('filter-btn')) {
+                document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active-filter'));
+                e.target.classList.add('active-filter');
+                const category = e.target.dataset.category;
+                
+                const recommendedIds = Array.from(recommendationsGrid.children).map(card => parseInt(card.dataset.id));
+                const otherExperiments = experiments.filter(exp => !recommendedIds.includes(exp.id));
+                
+                renderExperimentGrid(otherExperiments, category);
+            }
+        });
+
+        modal.addEventListener("click", e => {
+            const dialogDimensions = modal.getBoundingClientRect();
+            if (e.clientX < dialogDimensions.left || e.clientX > dialogDimensions.right || e.clientY < dialogDimensions.top || e.clientY > dialogDimensions.bottom) {
+                modal.close();
+            }
+        });
+
+        // --- INITIAL RENDER ---
+        renderQuiz();
+
+    </script>
+</body>
+</html>
